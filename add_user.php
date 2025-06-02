@@ -11,10 +11,33 @@
    $req_fields = array('full-name','username','password','level' );
    validate_fields($req_fields);
 
+   // Strong password policy check
+   $password_raw = $_POST['password'];
+   $password_errors = [];
+   if(strlen($password_raw) < 8) {
+     $password_errors[] = "Password must be at least 8 characters.";
+   }
+   if(!preg_match('/[A-Z]/', $password_raw)) {
+     $password_errors[] = "Password must contain at least one uppercase letter.";
+   }
+   if(!preg_match('/[a-z]/', $password_raw)) {
+     $password_errors[] = "Password must contain at least one lowercase letter.";
+   }
+   if(!preg_match('/[0-9]/', $password_raw)) {
+     $password_errors[] = "Password must contain at least one number.";
+   }
+   if(!preg_match('/[\W_]/', $password_raw)) {
+     $password_errors[] = "Password must contain at least one special character.";
+   }
+   if(!empty($password_errors)) {
+     $session->msg("d", $password_errors);
+     redirect('add_user.php', false);
+   }
+
    if(empty($errors)){
            $name   = remove_junk($db->escape($_POST['full-name']));
        $username   = remove_junk($db->escape($_POST['username']));
-       $password   = remove_junk($db->escape($_POST['password']));
+       $password   = remove_junk($db->escape($password_raw));
        $user_level = (int)$db->escape($_POST['level']);
        $password = sha1($password);
         $query = "INSERT INTO users (";

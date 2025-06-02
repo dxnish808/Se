@@ -42,27 +42,58 @@
 <?php
 // Update user password
 if(isset($_POST['update-pass'])) {
-  $req_fields = array('password');
+  $req_fields = array('old-password','password');
   validate_fields($req_fields);
+
+  // Strong password policy check
+  $password_raw = $_POST['password'];
+  $password_errors = [];
+  if(strlen($password_raw) < 8) {
+    $password_errors[] = "Password must be at least 8 characters.";
+  }
+  if(!preg_match('/[A-Z]/', $password_raw)) {
+    $password_errors[] = "Password must contain at least one uppercase letter.";
+  }
+  if(!preg_match('/[a-z]/', $password_raw)) {
+    $password_errors[] = "Password must contain at least one lowercase letter.";
+  }
+  if(!preg_match('/[0-9]/', $password_raw)) {
+    $password_errors[] = "Password must contain at least one number.";
+  }
+  if(!preg_match('/[\W_]/', $password_raw)) {
+    $password_errors[] = "Password must contain at least one special character.";
+  }
+  if(!empty($password_errors)) {
+    $session->msg("d", $password_errors);
+    redirect('edit_user.php?id='.(int)$e_user['id'], false);
+  }
+
+  // Old password verification
+  $submitted_old = sha1($_POST['old-password']);
+  $db_password = $e_user['password'];
+  if($submitted_old !== $db_password){
+    $session->msg('d', "Old password does not match.");
+    redirect('edit_user.php?id='.(int)$e_user['id'], false);
+  }
+
   if(empty($errors)){
-           $id = (int)$e_user['id'];
-     $password = remove_junk($db->escape($_POST['password']));
-     $h_pass   = sha1($password);
-          $sql = "UPDATE users SET password='{$h_pass}' WHERE id='{$db->escape($id)}'";
-       $result = $db->query($sql);
-        if($result && $db->affected_rows() === 1){
-          $session->msg('s',"User password has been updated ");
-          redirect('edit_user.php?id='.(int)$e_user['id'], false);
-        } else {
-          $session->msg('d',' Sorry failed to updated user password!');
-          redirect('edit_user.php?id='.(int)$e_user['id'], false);
-        }
+    $id = (int)$e_user['id'];
+    $password = remove_junk($db->escape($password_raw));
+    $h_pass   = sha1($password);
+    $sql = "UPDATE users SET password='{$h_pass}' WHERE id='{$db->escape($id)}'";
+    $result = $db->query($sql);
+    if($result && $db->affected_rows() === 1){
+      $session->msg('s',"User password has been updated ");
+      redirect('edit_user.php?id='.(int)$e_user['id'], false);
+    } else {
+      $session->msg('d',' Sorry failed to update user password!');
+      redirect('edit_user.php?id='.(int)$e_user['id'], false);
+    }
   } else {
     $session->msg("d", $errors);
     redirect('edit_user.php?id='.(int)$e_user['id'],false);
   }
 }
-
 ?>
 <?php include_once('layouts/header.php'); ?>
  <div class="row">
@@ -113,8 +144,12 @@ if(isset($_POST['update-pass'])) {
       <div class="panel-body">
         <form action="edit_user.php?id=<?php echo (int)$e_user['id'];?>" method="post" class="clearfix">
           <div class="form-group">
-                <label for="password" class="control-label">Password</label>
-                <input type="password" class="form-control" name="password" placeholder="Type user new password">
+                <label for="old-password" class="control-label">Old Password</label>
+                <input type="password" class="form-control" name="old-password" placeholder="Type old password" required>
+          </div>
+          <div class="form-group">
+                <label for="password" class="control-label">New Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Type user new password" required>
           </div>
           <div class="form-group clearfix">
                   <button type="submit" name="update-pass" class="btn btn-danger pull-right">Change</button>

@@ -22,6 +22,9 @@ function remove_junk($str){
 /* Function for Uppercase first character
 /*--------------------------------------------------------------*/
 function first_character($str){
+  if (is_array($str)) {
+    $str = implode(', ', $str); // Convert array to string
+  }
   $val = str_replace('-'," ",$str);
   $val = ucfirst($val);
   return $val;
@@ -44,18 +47,16 @@ function validate_fields($var){
    Ex echo displayt_msg($message);
 /*--------------------------------------------------------------*/
 function display_msg($msg =''){
-   $output = array();
-   if(!empty($msg)) {
-      foreach ($msg as $key => $value) {
-         $output  = "<div class=\"alert alert-{$key}\">";
-         $output .= "<a href=\"#\" class=\"close\" data-dismiss=\"alert\">&times;</a>";
-         $output .= remove_junk(first_character($value));
-         $output .= "</div>";
-      }
-      return $output;
-   } else {
-     return "" ;
-   }
+  if(!$msg) return '';
+  $output = '';
+  if(is_array($msg)){
+    foreach($msg as $m){
+      $output .= "<div class=\"alert alert-danger\">" . first_character($m) . "</div>";
+    }
+  } else {
+    $output .= "<div class=\"alert alert-danger\">" . first_character($msg) . "</div>";
+  }
+  return $output;
 }
 /*--------------------------------------------------------------*/
 /* Function for redirect
@@ -116,6 +117,14 @@ function randString($length = 5)
    $str .= $cha[mt_rand(0,strlen($cha))];
   return $str;
 }
-
+/*--------------------------------------------------------------*/
+/* Function for find user by username
+/*--------------------------------------------------------------*/
+function find_by_username($username) {
+  global $db;
+  $sql  = "SELECT * FROM users WHERE username = '{$db->escape($username)}' LIMIT 1";
+  $result = $db->query($sql);
+  return $db->fetch_assoc($result);
+}
 
 ?>

@@ -11,6 +11,29 @@
     $req_fields = array('new-password','old-password','id' );
     validate_fields($req_fields);
 
+    // Strong password policy check
+    $password_raw = $_POST['new-password'];
+    $password_errors = [];
+    if(strlen($password_raw) < 8) {
+      $password_errors[] = "Password must be at least 8 characters.";
+    }
+    if(!preg_match('/[A-Z]/', $password_raw)) {
+      $password_errors[] = "Password must contain at least one uppercase letter.";
+    }
+    if(!preg_match('/[a-z]/', $password_raw)) {
+      $password_errors[] = "Password must contain at least one lowercase letter.";
+    }
+    if(!preg_match('/[0-9]/', $password_raw)) {
+      $password_errors[] = "Password must contain at least one number.";
+    }
+    if(!preg_match('/[\W_]/', $password_raw)) {
+      $password_errors[] = "Password must contain at least one special character.";
+    }
+    if(!empty($password_errors)) {
+      $session->msg("d", $password_errors);
+      redirect('change_password.php', false);
+    }
+
     if(empty($errors)){
 
              if(sha1($_POST['old-password']) !== current_user()['password'] ){
@@ -23,9 +46,8 @@
             $sql = "UPDATE users SET password ='{$new}' WHERE id='{$db->escape($id)}'";
             $result = $db->query($sql);
                 if($result && $db->affected_rows() === 1):
-                  $session->logout();
-                  $session->msg('s',"Login with your new password.");
-                  redirect('index.php', false);
+                  $session->msg('s',"Successfully update.");
+                  redirect('edit_account.php', false); 
                 else:
                   $session->msg('d',' Sorry failed to updated!');
                   redirect('change_password.php', false);
