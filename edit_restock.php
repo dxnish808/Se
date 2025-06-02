@@ -2,7 +2,7 @@
   $page_title = 'Edit Restock';
   require_once('includes/load.php');
   // Check what level user has permission to view this page
-  page_require_level(3);
+  page_require_level(1);
 ?>
 <?php
 $restock = find_all_restock_product((int)$_GET['id']);

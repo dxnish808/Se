@@ -46,7 +46,7 @@
       <div class="panel-heading">
         <strong>
           <span class="glyphicon glyphicon-th"></span>
-          <span>Add New Stock</span>
+          <span>Add New Product</span>
         </strong>
       </div>
       <div class="panel-body">
@@ -64,7 +64,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <select class="form-control" name="product-categorie">
-                    <option value="">Select Stock Category</option>
+                    <option value="">Select Product Category</option>
                     <?php foreach ($all_categories as $cat): ?>
                       <option value="<?php echo (int)$cat['id'] ?>">
                         <?php echo $cat['name'] ?></option>

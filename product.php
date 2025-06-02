@@ -16,7 +16,7 @@
         <div class="panel-heading clearfix">
         <strong>
           <span class="glyphicon glyphicon-th"></span>
-          <span>Stocks</span>
+          <span>Products</span>
         </strong>
          <div class="pull-right">
            <a href="add_product.php" class="btn btn-info btn-sm">Add New</a>
@@ -27,11 +27,11 @@
             <thead>
               <tr>
                 <th class="text-center" style="width: 50px;">#</th>
-                <th> Stock Name </th>
+                <th> Product Name </th>
                 <th class="text-center" style="width: 10%;"> Categories </th>
                 <th class="text-center" style="width: 10%;"> In-Stock </th>
                 <th class="text-center" style="width: 10%;"> Buying Price </th>
-                <th class="text-center" style="width: 10%;"> Stock Added </th>
+                <th class="text-center" style="width: 10%;"> Product Added </th>
                 <th class="text-center" style="width: 100px;"> Actions </th>
               </tr>
             </thead>

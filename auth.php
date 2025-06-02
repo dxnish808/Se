@@ -32,7 +32,10 @@ if(empty($errors)){
         redirect('admin.php', false);
         break;
       case 2:
-        redirect('special.php', false);
+        redirect('home.php', false);
+        break;
+      case 3:
+        redirect('user.php', false);
         break;
       default:
         redirect('home.php', false);

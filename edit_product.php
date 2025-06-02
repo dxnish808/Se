@@ -2,7 +2,7 @@
   $page_title = 'Edit product';
   require_once('includes/load.php');
   // Checkin What level user has permission to view this page
-   page_require_level(2);
+   page_require_level(1);
 ?>
 <?php
 $product = find_by_id('products',(int)$_GET['id']);
@@ -56,7 +56,7 @@ if(!$product){
         <div class="panel-heading">
           <strong>
             <span class="glyphicon glyphicon-th"></span>
-            <span>Add New Product</span>
+            <span>Edit Product</span>
          </strong>
         </div>
         <div class="panel-body">
