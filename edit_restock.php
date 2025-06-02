@@ -1,28 +1,44 @@
 <?php
   $page_title = 'Edit Restock';
   require_once('includes/load.php');
-  // Check what level user has permission to view this page
   page_require_level(1);
+
+  // Validate restock ID
+  $restock_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+  if ($restock_id <= 0) {
+    error_log("Invalid restock id: " . $_GET['id']);
+    $session->msg("d","Invalid restock id.");
+    redirect('restock.php');
+  }
+  $restock = find_all_restock_product($restock_id);
+  $restock = $restock[0];
+  $all_products = find_all('products');
+
+  if(!$restock){
+    $session->msg("d","Missing restock id.");
+    redirect('restock.php');
+  }
 ?>
 <?php
-$restock = find_all_restock_product((int)$_GET['id']);
-$restock = $restock[0];
-$all_products = find_all('products');
-
-if(!$restock){
-  $session->msg("d","Missing restock id.");
-  redirect('restock.php');
-}
-?>
-<?php
-
   if(isset($_POST['update_restock'])){
     $req_fields = array('product_id','quantity', 'date' );
     validate_fields($req_fields);
+
+    // Validate numeric fields
+    $pid = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+    $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 0;
+    $date = isset($_POST['date']) ? $_POST['date'] : '';
+
+    if($pid <= 0 || $quantity < 0 || empty($date)){
+      error_log("Invalid input on edit_restock: pid=$pid, qty=$quantity, date=$date");
+      $session->msg("d", "Invalid input values.");
+      redirect('edit_restock.php?id='.$restock_id, false);
+    }
+
     if(empty($errors)){
-      $pid  = $db->escape((int)$_POST['product_id']);
-      $quantity     = $db->escape((int)$_POST['quantity']);
-      $date         = $db->escape($_POST['date']);
+      $pid  = $db->escape($pid);
+      $quantity     = $db->escape($quantity);
+      $date         = $db->escape($date);
 
       $sql  = "UPDATE restock SET";
       $sql .= " product_id='{$pid}', quantity='{$quantity}', date='{$date}'";
@@ -33,7 +49,6 @@ if(!$restock){
         redirect('edit_restock.php?id='.$restock['id'], false);
       } else {
         $session->msg('d',' No data updated!');
-        // redirect('restock.php', false);
         redirect('edit_restock.php?id='.$restock['id'], false);
       }
     } else {
@@ -41,7 +56,6 @@ if(!$restock){
       redirect('edit_restock.php?id='.(int)$restock['id'],false);
     }
   }
-
 ?>
 <?php include_once('layouts/header.php'); ?>
 <div class="row">

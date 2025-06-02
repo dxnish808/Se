@@ -3,18 +3,17 @@
   // Checkin What level user has permission to view this page
   page_require_level(3);
 
-  $restock_id = (int)$_GET['id'];
-  if(!$restock_id){
-    $session->msg("d","Missing restock id.");
+  $restock_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+  if($restock_id <= 0){
+    error_log("Invalid delete_restock id: " . $_GET['id']);
+    $session->msg("d","Invalid restock id.");
     redirect('restock.php');
   }
 
-  // Attempt to delete the restock item
   if (delete_by_id('restock', $restock_id)) {
       $session->msg("s","Restock deleted.");
       redirect('restock.php');
   } else {
-      // Capture detailed error messages
       $session->msg("d","Restock deletion failed: " . $db->error);
       redirect('restock.php');
   }

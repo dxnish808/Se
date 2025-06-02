@@ -2,28 +2,41 @@
   $page_title = 'Edit product';
   require_once('includes/load.php');
   // Checkin What level user has permission to view this page
-   page_require_level(1);
-?>
-<?php
-$product = find_by_id('products',(int)$_GET['id']);
-$all_categories = find_all('categories');
-$all_photo = find_all('media');
-if(!$product){
-  $session->msg("d","Missing product id.");
-  redirect('product.php');
-}
+  page_require_level(1);
+
+  // Validate product ID from GET
+  $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+  if ($product_id <= 0) {
+    error_log("Invalid product id: " . $_GET['id']);
+    $session->msg("d","Invalid product id.");
+    redirect('product.php');
+  }
+  $product = find_by_id('products', $product_id);
+  $all_categories = find_all('categories');
+  $all_photo = find_all('media');
+  if(!$product){
+    $session->msg("d","Missing product id.");
+    redirect('product.php');
+  }
 ?>
 <?php
  if(isset($_POST['product'])){
     $req_fields = array('product-title','product-categorie','product-quantity','buying-price');
     validate_fields($req_fields);
 
+    // Validate numeric fields
+    $p_cat = isset($_POST['product-categorie']) ? (int)$_POST['product-categorie'] : 0;
+    $p_qty = isset($_POST['product-quantity']) ? (int)$_POST['product-quantity'] : 0;
+    $p_buy = isset($_POST['buying-price']) ? (float)$_POST['buying-price'] : 0;
+
+    if($p_cat <= 0 || $p_qty < 0 || $p_buy < 0){
+      error_log("Invalid input on edit_product: cat=$p_cat, qty=$p_qty, buy=$p_buy");
+      $session->msg("d", "Invalid input values.");
+      redirect('edit_product.php?id='.$product_id, false);
+    }
+
    if(empty($errors)){
        $p_name  = remove_junk($db->escape($_POST['product-title']));
-       $p_cat   = (int)$_POST['product-categorie'];
-       $p_qty   = remove_junk($db->escape($_POST['product-quantity']));
-       $p_buy   = remove_junk($db->escape($_POST['buying-price']));
-
        $query   = "UPDATE products SET";
        $query  .=" name ='{$p_name}', quantity ='{$p_qty}',";
        $query  .=" buy_price ='{$p_buy}',categorie_id ='{$p_cat}' ";
@@ -36,14 +49,11 @@ if(!$product){
                  $session->msg('d',' Sorry failed to updated!');
                  redirect('edit_product.php?id='.$product['id'], false);
                }
-
    } else{
        $session->msg("d", $errors);
        redirect('edit_product.php?id='.$product['id'], false);
    }
-
  }
-
 ?>
 <?php include_once('layouts/header.php'); ?>
 <div class="row">
