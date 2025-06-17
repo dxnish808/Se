@@ -22,7 +22,6 @@
       </a>
       <ul class="nav submenu">
          <li><a href="restock.php">Verification</a> </li>
-         <li><a href="add_stock.php">Add order</a> </li>
      </ul>
   </li>
 </ul>
