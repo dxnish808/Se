@@ -21,7 +21,7 @@
        <span>Restock</span>
       </a>
       <ul class="nav submenu">
-         <li><a href="restock.php">Verification</a> </li>
+         <li><a href="restock.php">Verifications</a> </li>
      </ul>
   </li>
 </ul>
